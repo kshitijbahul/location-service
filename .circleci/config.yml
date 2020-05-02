@@ -23,7 +23,7 @@ jobs:
           key: location-service-{{ checksum "pom.xml" }}
       - run: mvn clean package
       - persist_to_workspace:
-          root: /target
+          root: ~/location-service/target
           paths:
             - /location-service.jar
 
