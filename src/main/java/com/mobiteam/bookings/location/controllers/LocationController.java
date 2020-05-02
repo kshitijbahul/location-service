@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class LocationController {
     @GetMapping("/")
     private ResponseEntity sayHello(){
-        return ResponseEntity.ok("Hello");
+        return ResponseEntity.ok("Hello Locations");
     }
 }
