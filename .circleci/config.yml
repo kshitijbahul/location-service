@@ -41,7 +41,8 @@ workflows:
     jobs:
       - test_and_build_jar
       - aws-ecs/deploy-service-update:
-          requires: test_and_build_jar
+          requires:
+            - test_and_build_jar
           family: loc-serv
           cluster-name: location-service-cluster-2
           container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
