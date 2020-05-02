@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   maven: circleci/maven@1.0.1
+  aws-ecs: circleci/aws-ecs@1.1.0
 
 #workflows:
 #  maven_test:
@@ -39,6 +40,13 @@ workflows:
   build_and_push:
     jobs:
       - test_and_build_jar
+      - aws-ecs/deploy-service-update:
+          requires: test_and_build_jar
+          family: loc-serv
+          cluster-name: location-service-cluster-2
+          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+
+
 
 
 
