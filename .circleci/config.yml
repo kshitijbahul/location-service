@@ -25,7 +25,7 @@ jobs:
       - persist_to_workspace:
           root: ~/location-service/target
           paths:
-            - /location-service.jar
+            - location-service.jar
 
 workflows:
   version: 2.1
