@@ -8,12 +8,13 @@ orbs:
 #    jobs:
 #      - maven/test # checkout, build, test, and upload test results
 jobs:
-  build_image:
+  test_and_build_jar:
     working_directory: ~/location-service
     docker:
       - image: circleci/openjdk:8-jdk-stretch
     steps:
       - checkout
+      - setup_remote_docker
       - restore_cache:
           key: location-service-{{ checksum "pom.xml" }}
       - run: mvn dependency:go-offline
@@ -22,16 +23,22 @@ jobs:
             - ~/.m2
           key: location-service-{{ checksum "pom.xml" }}
       - run: mvn clean package
+      - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
+      - run: docker build -t kshitijbahul/location-service:$CIRCLE_SHA1 .
+      - run: docker push kshitijbahul/location-service:$CIRCLE_SHA1
       - persist_to_workspace:
-          root: ~/location-service/target
+          root: ~/location-service/
           paths:
-            - location-service.jar
+            - Dockerfile
+            - target/location-service.jar
+  #create_docker_image:
+    #steps:
 
 workflows:
   version: 2.1
   build_and_push:
     jobs:
-      - build_image
+      - test_and_build_jar
 
 
 
