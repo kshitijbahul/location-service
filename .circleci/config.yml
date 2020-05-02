@@ -43,7 +43,7 @@ workflows:
       - aws-ecs/deploy-service-update:
           requires:
             - test_and_build_jar
-          family: loc-serv
+          family: location-service-task
           cluster-name: location-service-cluster-2
           container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_SHA1}'
 
