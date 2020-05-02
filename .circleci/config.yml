@@ -45,7 +45,7 @@ workflows:
             - test_and_build_jar
           family: loc-serv
           cluster-name: location-service-cluster-2
-          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+          container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_SHA1}'
 
 
 
