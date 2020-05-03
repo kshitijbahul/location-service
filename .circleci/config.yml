@@ -1,9 +1,41 @@
 version: 2.1
 
 orbs:
-  maven: circleci/maven@0.0.12
+  aws-ecs: circleci/aws-ecs@1.1.0
+
+jobs:
+  test_and_build_jar:
+    working_directory: ~/location-service
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: location-service-{{ checksum "pom.xml" }}
+      - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: location-service-{{ checksum "pom.xml" }}
+      - run: mvn clean package
+      - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
+      - run: docker build -t kshitijbahul/location-service:$CIRCLE_SHA1 .
+      - run: docker push kshitijbahul/location-service:$CIRCLE_SHA1
 
 workflows:
-  maven_test:
+  version: 2.1
+  build_and_push:
     jobs:
-      - maven/test # checkout, build, test, and upload test results
+      - test_and_build_jar
+      - aws-ecs/deploy-service-update:
+          requires:
+            - test_and_build_jar
+          family: location-service-task
+          cluster-name: location-service-cluster-2
+          container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_SHA1}'
+
+
+
+
+
