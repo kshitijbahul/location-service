@@ -1,6 +1,8 @@
 server:
   port: 6001
-
+location:
+  api:
+    url: 'http://ip-api.com/json'
 management:
   endpoints:
     web:
