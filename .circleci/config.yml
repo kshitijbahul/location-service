@@ -64,7 +64,7 @@ workflows:
       - tag_buit_image:
           filters:
             tags:
-              only: /.*/
+              only: /^test.*/
       - aws-ecs/deploy-service-update:
           filters:
             tags:
