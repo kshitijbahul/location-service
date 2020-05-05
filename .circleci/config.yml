@@ -24,6 +24,10 @@ jobs:
             - ~/.m2
           key: location-service-{{ checksum "pom.xml" }}
       - run: mvn clean package
+      - save_cache:
+          paths:
+            - ~/location-service/
+          key: location-service-{{ checksum "pom.xml" }}
       - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
       - run: docker build -t kshitijbahul/location-service:$CIRCLE_SHA1 .
       - run: docker push kshitijbahul/location-service:$CIRCLE_SHA1
@@ -32,6 +36,15 @@ jobs:
           paths:
             - Dockerfile
             - target/location-service.jar
+  tag_buit_image:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
+      - run: docker image tag kshitijbahul/location-service:$CIRCLE_SHA1 kshitijbahul/location-service:$CIRCLE_TAG
+      - run: docker push kshitijbahul/location-service:$CIRCLE_TAG
   #create_docker_image:
     #steps:
 
@@ -46,8 +59,21 @@ workflows:
           family: location-service-task
           cluster-name: location-service-cluster-2
           container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_SHA1}'
-
-
+  promote_build:
+    jobs:
+      - tag_buit_image:
+          filters:
+            tags:
+              only: /*/
+      - aws-ecs/deploy-service-update:
+          filters:
+            tags:
+              only: /^test.*/
+          requires:
+            - tag_buit_image
+          family: location-service-task
+          cluster-name: location-service-cluster-2
+          container-image-name-updates: 'container=location-service-container,tag=${$CIRCLE_TAG}'
 
 
 
