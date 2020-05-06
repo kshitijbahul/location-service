@@ -22,6 +22,16 @@ jobs:
       - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
       - run: docker build -t kshitijbahul/location-service:$CIRCLE_SHA1 .
       - run: docker push kshitijbahul/location-service:$CIRCLE_SHA1
+  tag_buit_image:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
+      - run: docker pull kshitijbahul/location-service:$CIRCLE_SHA1
+      - run: docker image tag kshitijbahul/location-service:$CIRCLE_SHA1 kshitijbahul/location-service:$CIRCLE_TAG
+      - run: docker push kshitijbahul/location-service:$CIRCLE_TAG
 
 workflows:
   version: 2.1
@@ -34,6 +44,26 @@ workflows:
           family: location-service-task
           cluster-name: location-service-cluster-2
           container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_SHA1}'
+
+    promote_build_to_test:
+      jobs:
+        - tag_buit_image:
+            filters:
+              tags:
+                only: /^test.*/
+              branches:
+                ignore: /.*/
+        - aws-ecs/deploy-service-update:
+            filters:
+              tags:
+                only: /^test.*/
+              branches:
+                ignore: /.*/
+            requires:
+              - tag_buit_image
+            family: location-service-task
+            cluster-name: location-service-cluster-2
+            container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_TAG}'
 
 
 
