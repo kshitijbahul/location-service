@@ -45,25 +45,25 @@ workflows:
           cluster-name: location-service-cluster-2
           container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_SHA1}'
 
-    promote_build_to_test:
-      jobs:
-        - tag_buit_image:
-            filters:
-              tags:
-                only: /^test.*/
-              branches:
-                ignore: /.*/
-        - aws-ecs/deploy-service-update:
-            filters:
-              tags:
-                only: /^test.*/
-              branches:
-                ignore: /.*/
-            requires:
-              - tag_buit_image
-            family: location-service-task
-            cluster-name: location-service-cluster-2
-            container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_TAG}'
+  promote_build_to_test:
+    jobs:
+      - tag_buit_image:
+          filters:
+            tags:
+              only: /^test.*/
+            branches:
+              ignore: /.*/
+      - aws-ecs/deploy-service-update:
+          filters:
+            tags:
+              only: /^test.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - tag_buit_image
+          family: location-service-task
+          cluster-name: location-service-cluster-2
+          container-image-name-updates: 'container=location-service-container,tag=${CIRCLE_TAG}'
 
 
 
