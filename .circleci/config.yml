@@ -69,6 +69,8 @@ workflows:
           filters:
             tags:
               only: /^test.*/
+            branches:
+              ignore : /.*/
           requires:
             - tag_buit_image
           family: location-service-task
