@@ -51,6 +51,7 @@ jobs:
 
 workflows:
   version: 2.1
+  #TODO: Run this only on master
   build_and_push:
     jobs:
       - test_and_build_jar
