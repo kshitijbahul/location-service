@@ -65,6 +65,8 @@ workflows:
           filters:
             tags:
               only: /^test.*/
+            branches:
+              ignore: /.*/
       - aws-ecs/deploy-service-update:
           filters:
             tags:
