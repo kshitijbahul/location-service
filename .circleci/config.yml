@@ -43,6 +43,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
+      - run : docker pull kshitijbahul/location-service:$CIRCLE_SHA1
       - run: docker image tag kshitijbahul/location-service:$CIRCLE_SHA1 kshitijbahul/location-service:$CIRCLE_TAG
       - run: docker push kshitijbahul/location-service:$CIRCLE_TAG
   #create_docker_image:
